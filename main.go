@@ -14,13 +14,18 @@ import (
 	"golang.org/x/tools/go/buildutil"
 )
 
+type Range struct {
+	Start token.Pos `json:"start"`
+	End   token.Pos `json:"end"`
+}
+
 type Declaration struct {
-	Label        string        `json:"label"`
-	Type         string        `json:"type"`
-	ReceiverType string        `json:"receiverType,omitempty"`
-	Start        token.Pos     `json:"start"`
-	End          token.Pos     `json:"end"`
-	Children     []Declaration `json:"children,omitempty"`
+	Label        string `json:"label"`
+	Type         string `json:"type"`
+	ReceiverType string `json:"receiverType,omitempty"`
+	Range
+	Identifier *Range        `json:"identifier,omitempty"`
+	Children   []Declaration `json:"children,omitempty"`
 }
 
 var (
@@ -28,6 +33,21 @@ var (
 	importsOnly = flag.Bool("imports-only", false, "parse imports only")
 	modified    = flag.Bool("modified", false, "read an archive of the modified file from standard input")
 )
+
+func nodeRange(n ast.Node) Range {
+	return Range{
+		Start: n.Pos(),
+		End:   n.End(),
+	}
+}
+
+func identRange(i *ast.Ident) *Range {
+	if i == nil {
+		return nil
+	}
+	r := nodeRange(i)
+	return &r
+}
 
 func main() {
 	flag.Parse()
@@ -71,8 +91,8 @@ func main() {
 				decl.Name.String(),
 				"function",
 				receiverType,
-				decl.Pos(),
-				decl.End(),
+				nodeRange(decl),
+				identRange(decl.Name),
 				[]Declaration{},
 			})
 		case *ast.GenDecl:
@@ -83,8 +103,8 @@ func main() {
 						spec.Path.Value,
 						"import",
 						"",
-						spec.Pos(),
-						spec.End(),
+						nodeRange(spec),
+						identRange(spec.Name),
 						[]Declaration{},
 					})
 				case *ast.TypeSpec:
@@ -93,8 +113,8 @@ func main() {
 						spec.Name.String(),
 						"type",
 						"",
-						spec.Pos(),
-						spec.End(),
+						nodeRange(spec),
+						identRange(spec.Name),
 						[]Declaration{},
 					})
 				case *ast.ValueSpec:
@@ -103,8 +123,8 @@ func main() {
 							id.Name,
 							"variable",
 							"",
-							id.Pos(),
-							id.End(),
+							nodeRange(id),
+							identRange(id),
 							[]Declaration{},
 						})
 					}
@@ -121,8 +141,8 @@ func main() {
 		fileAst.Name.String(),
 		"package",
 		"",
-		fileAst.Pos(),
-		fileAst.End(),
+		nodeRange(fileAst),
+		identRange(fileAst.Name),
 		declarations,
 	}}
 
