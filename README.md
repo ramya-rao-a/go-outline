@@ -6,7 +6,7 @@ Go source file.
 ## Installing
 
 ```bash
-go get -u github.com/lukehoban/go-outline
+go get -u github.com/ramya-rao-a/go-outline
 ```
 
 ## Using
