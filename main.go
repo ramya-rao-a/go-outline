@@ -113,7 +113,7 @@ func main() {
 				}
 			}
 		default:
-			reportError(fmt.Errorf("Unknown declaration @", decl.Pos()))
+			reportError(fmt.Errorf("Unknown declaration @ %v", decl.Pos()))
 		}
 	}
 
