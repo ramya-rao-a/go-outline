@@ -24,9 +24,10 @@ type Declaration struct {
 }
 
 var (
-	file        = flag.String("f", "", "the path to the file to outline")
-	importsOnly = flag.Bool("imports-only", false, "parse imports only")
-	modified    = flag.Bool("modified", false, "read an archive of the modified file from standard input")
+	file            = flag.String("f", "", "the path to the file to outline")
+	importsOnly     = flag.Bool("imports-only", false, "parse imports only")
+	includeComments = flag.Bool("include-comments", false, "parse comments")
+	modified        = flag.Bool("modified", false, "read an archive of the modified file from standard input")
 )
 
 func main() {
@@ -114,6 +115,21 @@ func main() {
 			}
 		default:
 			reportError(fmt.Errorf("Unknown declaration @", decl.Pos()))
+		}
+	}
+
+	if !*importsOnly && *includeComments {
+		for _, commentGroup := range fileAst.Comments {
+			for _, comment := range commentGroup.List {
+				declarations = append(declarations, Declaration{
+					comment.Text,
+					"comment",
+					"",
+					comment.Pos(),
+					comment.End(),
+					[]Declaration{},
+				})
+			}
 		}
 	}
 

@@ -1,7 +1,6 @@
 # Go Outline
 
-Simple utility for extracting a JSON representation of the declarations in a 
-Go source file.
+Simple utility for extracting a JSON representation of the declarations in a Go source file.
 
 ## Installing
 
@@ -9,26 +8,37 @@ Go source file.
 go get -u github.com/ramya-rao-a/go-outline
 ```
 
-## Using
+## Usage
+
 ```bash
 > go-outline -f file.go
 [{"label":"proc","type":"package",<...>}]
 ```
 
-To parse and return only imports
+### To parse and return only imports
+
 ```bash
 > go-outline -f file.go -imports-only
 ```
 
-To parse unsaved file contents, use the `-modified` flag along with the `-f` flag and write an archive to stdin.  
-File in the archive will be preferred over the one on disk.
+### To parse and return comments
+
+```bash
+> go-outline -f file.go -include-comments
+```
+
+### To parse unsaved file contents
+
+Use the `-modified` flag along with the `-f` flag and write an archive to `stdin`. File in the archive will be preferred over the one on disk.
 
 The archive entry consists of:
- - the file name, followed by a newline
- - the (decimal) file size, followed by a newline
- - the contents of the file
 
-### Schema
+- the file name, followed by a newline
+- the (decimal) file size, followed by a newline
+- the contents of the file
+
+## Schema
+
 ```go
 type Declaration struct {
 	Label        string        `json:"label"`
