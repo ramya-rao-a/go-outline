@@ -100,7 +100,7 @@ func main() {
 				case *ast.ValueSpec:
 					for _, id := range spec.Names {
 						varOrConst := "variable"
-						if "const" == decl.Tok.String() {
+						if decl.Tok == token.CONST {
 							varOrConst = "constant"
 						}
 						declarations = append(declarations, Declaration{
