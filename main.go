@@ -37,6 +37,11 @@ func main() {
 		parserMode = parser.ImportsOnly
 	}
 
+	if *file == "" {
+		reportError(fmt.Errorf("Must supply the -f option"))
+		os.Exit(1)
+	}
+
 	var fileAst *ast.File
 	var err error
 
@@ -56,6 +61,7 @@ func main() {
 
 	if err != nil {
 		reportError(fmt.Errorf("Could not parse file %s", *file))
+		os.Exit(1)
 	}
 
 	declarations := []Declaration{}
