@@ -33,14 +33,14 @@ func main() {
 	flag.Parse()
 	fset := token.NewFileSet()
 	parserMode := parser.ParseComments
-	if *importsOnly == true {
+	if *importsOnly {
 		parserMode = parser.ImportsOnly
 	}
 
 	var fileAst *ast.File
 	var err error
 
-	if *modified == true {
+	if *modified {
 		archive, err := buildutil.ParseOverlayArchive(os.Stdin)
 		if err != nil {
 			reportError(fmt.Errorf("failed to parse -modified archive: %v", err))
@@ -55,7 +55,8 @@ func main() {
 	}
 
 	if err != nil {
-		reportError(fmt.Errorf("Could not parse file %s", *file))
+		reportError(fmt.Errorf("could not parse file %s", *file))
+		return
 	}
 
 	declarations := []Declaration{}
@@ -113,15 +114,17 @@ func main() {
 						})
 					}
 				default:
-					reportError(fmt.Errorf("Unknown token type: %s", decl.Tok))
+					reportError(fmt.Errorf("unknown token type: %s", decl.Tok))
+					return
 				}
 			}
 		default:
-			reportError(fmt.Errorf("Unknown declaration @ %v", decl.Pos()))
+			reportError(fmt.Errorf("unknown declaration @ %v", decl.Pos()))
+			return
 		}
 	}
 
-	pkg := []*Declaration{&Declaration{
+	pkg := []*Declaration{{
 		fileAst.Name.String(),
 		"package",
 		"",
